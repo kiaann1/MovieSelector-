@@ -1,6 +1,25 @@
 @import "tailwindcss";
 
-:root {
+/* Accent tokens stay named --gold* so existing utility classes keep working. */
+:root,
+[data-theme="violet"] {
+  --ink: #07060c;
+  --ink-elevated: #100e18;
+  --surface: #171522;
+  --cream: #efeaf8;
+  --muted: #9b93b0;
+  --gold: #a78bfa;
+  --gold-bright: #c4b5fd;
+  --danger: #f87171;
+  --btn-text: #12081f;
+  --glow-1: rgba(167, 139, 250, 0.18);
+  --glow-2: rgba(124, 58, 237, 0.1);
+  --font-display: var(--font-violet-display);
+  --font-body: var(--font-violet-body);
+  --radius-btn: 0.9rem;
+}
+
+[data-theme="cinema"] {
   --ink: #0c0b09;
   --ink-elevated: #141210;
   --surface: #1c1915;
@@ -9,6 +28,80 @@
   --gold: #d4a373;
   --gold-bright: #e8c49a;
   --danger: #c45c4a;
+  --btn-text: #1a120a;
+  --glow-1: rgba(212, 163, 115, 0.12);
+  --glow-2: rgba(196, 92, 74, 0.06);
+  --font-display: var(--font-cinema-display);
+  --font-body: var(--font-cinema-body);
+  --radius-btn: 0.9rem;
+}
+
+[data-theme="cyberpunk"] {
+  --ink: #05050a;
+  --ink-elevated: #0c0c14;
+  --surface: #12121c;
+  --cream: #e8f7ff;
+  --muted: #7f93a8;
+  --gold: #22d3ee;
+  --gold-bright: #67e8f9;
+  --danger: #f472b6;
+  --btn-text: #041016;
+  --glow-1: rgba(34, 211, 238, 0.16);
+  --glow-2: rgba(244, 114, 182, 0.12);
+  --font-display: var(--font-cyber-display);
+  --font-body: var(--font-cyber-body);
+  --radius-btn: 0.35rem;
+}
+
+[data-theme="anime"] {
+  --ink: #0e0a12;
+  --ink-elevated: #17101f;
+  --surface: #1f1529;
+  --cream: #fff5fb;
+  --muted: #b5a0bc;
+  --gold: #f9a8d4;
+  --gold-bright: #fbcfe8;
+  --danger: #fb7185;
+  --btn-text: #2a1020;
+  --glow-1: rgba(249, 168, 212, 0.16);
+  --glow-2: rgba(125, 211, 252, 0.1);
+  --font-display: var(--font-anime-display);
+  --font-body: var(--font-anime-body);
+  --radius-btn: 1.25rem;
+}
+
+[data-theme="superhero"] {
+  --ink: #07070c;
+  --ink-elevated: #101018;
+  --surface: #181822;
+  --cream: #f5f5ff;
+  --muted: #9aa0b8;
+  --gold: #ef4444;
+  --gold-bright: #f87171;
+  --danger: #3b82f6;
+  --btn-text: #140404;
+  --glow-1: rgba(239, 68, 68, 0.16);
+  --glow-2: rgba(59, 130, 246, 0.12);
+  --font-display: var(--font-hero-display);
+  --font-body: var(--font-hero-body);
+  --radius-btn: 0.5rem;
+}
+
+[data-theme="noir"] {
+  --ink: #050505;
+  --ink-elevated: #0f0f0f;
+  --surface: #171717;
+  --cream: #f5f5f5;
+  --muted: #a3a3a3;
+  --gold: #e5e5e5;
+  --gold-bright: #fafafa;
+  --danger: #a3a3a3;
+  --btn-text: #0a0a0a;
+  --glow-1: rgba(255, 255, 255, 0.06);
+  --glow-2: rgba(163, 163, 163, 0.05);
+  --font-display: var(--font-noir-display);
+  --font-body: var(--font-noir-body);
+  --radius-btn: 0.25rem;
 }
 
 @theme inline {
@@ -33,13 +126,17 @@ html {
 body {
   background-color: var(--ink);
   background-image:
-    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(212, 163, 115, 0.12), transparent 55%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(196, 92, 74, 0.06), transparent 50%);
+    radial-gradient(ellipse 120% 80% at 50% -20%, var(--glow-1), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, var(--glow-2), transparent 50%);
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: var(--cream);
   font-family: var(--font-body), system-ui, sans-serif;
   min-height: 100dvh;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    font-family 0.2s ease;
 }
 
 .app-frame,
@@ -56,9 +153,9 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 2.75rem;
-  border-radius: 0.9rem;
+  border-radius: var(--radius-btn);
   background: linear-gradient(180deg, var(--gold-bright), var(--gold));
-  color: #1a120a;
+  color: var(--btn-text);
   font-weight: 600;
   padding: 0.65rem 1.1rem;
   transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
@@ -81,9 +178,9 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 2.75rem;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(242, 235, 227, 0.14);
-  background: rgba(242, 235, 227, 0.04);
+  border-radius: var(--radius-btn);
+  border: 1px solid color-mix(in srgb, var(--cream) 14%, transparent);
+  background: color-mix(in srgb, var(--cream) 4%, transparent);
   color: var(--cream);
   font-weight: 500;
   padding: 0.65rem 1.1rem;
@@ -91,8 +188,8 @@ body {
 }
 
 .btn-secondary:hover {
-  border-color: rgba(212, 163, 115, 0.45);
-  background: rgba(212, 163, 115, 0.08);
+  border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
 }
 
 .btn-ghost {
@@ -100,7 +197,7 @@ body {
   align-items: center;
   justify-content: center;
   min-height: 2.5rem;
-  border-radius: 0.75rem;
+  border-radius: var(--radius-btn);
   color: var(--muted);
   padding: 0.5rem 0.85rem;
   font-size: 0.875rem;
@@ -108,26 +205,26 @@ body {
 
 .btn-ghost:hover {
   color: var(--cream);
-  background: rgba(242, 235, 227, 0.05);
+  background: color-mix(in srgb, var(--cream) 5%, transparent);
 }
 
 .input-field {
   min-height: 2.75rem;
-  border-radius: 0.9rem;
-  border: 1px solid rgba(242, 235, 227, 0.12);
-  background: rgba(12, 11, 9, 0.65);
+  border-radius: var(--radius-btn);
+  border: 1px solid color-mix(in srgb, var(--cream) 12%, transparent);
+  background: color-mix(in srgb, var(--ink) 65%, transparent);
   color: var(--cream);
   padding: 0.65rem 0.95rem;
   outline: none;
 }
 
 .input-field:focus {
-  border-color: rgba(212, 163, 115, 0.55);
-  box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.12);
+  border-color: color-mix(in srgb, var(--gold) 55%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--gold) 12%, transparent);
 }
 
 .input-field::placeholder {
-  color: rgba(154, 144, 133, 0.8);
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
 }
 
 @keyframes fade-in {
@@ -206,8 +303,8 @@ body {
   inset-inline: 0;
   bottom: 0;
   z-index: 40;
-  border-top: 1px solid rgba(212, 163, 115, 0.15);
-  background: rgba(12, 11, 9, 0.95);
+  border-top: 1px solid color-mix(in srgb, var(--gold) 18%, transparent);
+  background: color-mix(in srgb, var(--ink) 92%, transparent);
   backdrop-filter: blur(12px);
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -259,10 +356,10 @@ body {
     width: 15.5rem;
     flex-shrink: 0;
     padding: 1.75rem 1.25rem;
-    border-right: 1px solid rgba(242, 235, 227, 0.08);
+    border-right: 1px solid color-mix(in srgb, var(--cream) 8%, transparent);
     background:
-      linear-gradient(180deg, rgba(212, 163, 115, 0.06), transparent 40%),
-      rgba(20, 18, 16, 0.92);
+      linear-gradient(180deg, color-mix(in srgb, var(--gold) 8%, transparent), transparent 40%),
+      color-mix(in srgb, var(--ink-elevated) 92%, transparent);
   }
 
   .app-sidebar-brand {
@@ -284,12 +381,12 @@ body {
 
   .app-sidebar-link:hover {
     color: var(--cream);
-    background: rgba(242, 235, 227, 0.05);
+    background: color-mix(in srgb, var(--cream) 5%, transparent);
   }
 
   .app-sidebar-link.is-active {
     color: var(--gold);
-    background: rgba(212, 163, 115, 0.12);
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
   }
 
   .app-bottom-nav {
@@ -323,7 +420,8 @@ body {
   .media-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 1.75rem;
+    align-items: stretch;
   }
 
   .detail-layout {
@@ -371,6 +469,7 @@ body {
 
   .media-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 2rem;
   }
 }
 

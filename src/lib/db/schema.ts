@@ -26,6 +26,7 @@ export const users = pgTable(
     avatarDataUrl: text("avatar_data_url"),
     favoriteGenres: jsonb("favorite_genres").$type<string[]>().default([]),
     favoriteMovies: jsonb("favorite_movies").$type<FavoriteMovie[]>().default([]),
+    theme: text("theme").default("violet").notNull(),
     createdAt: timestamp("created_at").defaultNow().notNull(),
   },
   (t) => [uniqueIndex("users_pin_hash_idx").on(t.pinHash)],

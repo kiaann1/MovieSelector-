@@ -118,7 +118,7 @@ export default function WatchlistPage() {
         </button>
       </header>
 
-      <div className="mb-6 flex gap-2 rounded-2xl border border-cream/10 bg-surface/50 p-1 max-w-md">
+      <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
         {(
           [
             { id: "all", label: "All" },
@@ -130,8 +130,10 @@ export default function WatchlistPage() {
             key={t.id}
             type="button"
             onClick={() => setFilter(t.id)}
-            className={`flex-1 min-h-11 rounded-xl text-sm font-medium transition ${
-              filter === t.id ? "bg-gold text-ink" : "text-muted hover:text-cream"
+            className={`min-h-10 shrink-0 rounded-xl px-4 text-sm border transition ${
+              filter === t.id
+                ? "border-gold bg-gold/15 text-gold"
+                : "border-cream/10 text-muted hover:text-cream"
             }`}
           >
             {t.label}

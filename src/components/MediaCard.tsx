@@ -15,6 +15,7 @@ type Props = {
   imdbRating?: string | null;
   rtRating?: string | null;
   reason?: string | null;
+  footer?: React.ReactNode;
   actions?: React.ReactNode;
 };
 
@@ -29,12 +30,13 @@ export function MediaCard({
   imdbRating,
   rtRating,
   reason,
+  footer,
   actions,
 }: Props) {
   const href = mediaType === "tv" ? `/tv/${tmdbId}` : `/movie/${tmdbId}`;
 
   return (
-    <article className="flex gap-3 rounded-2xl border border-cream/8 bg-surface/60 p-3 transition hover:border-gold/25 h-full">
+    <article className="flex gap-3 rounded-2xl border border-cream/8 bg-surface/60 p-3 md:p-4 transition hover:border-gold/25 h-full">
       <Link href={href} className="shrink-0">
         <Poster src={posterUrl} alt={title} className="h-[132px] w-[88px] md:h-[148px] md:w-[98px] rounded-lg" />
       </Link>
@@ -52,10 +54,13 @@ export function MediaCard({
           </p>
         </Link>
         {overview && <p className="mt-2 text-sm text-cream/55 line-clamp-2 md:line-clamp-3">{overview}</p>}
-        <div className="mt-auto pt-2">
+        <div className="mt-auto pt-3 space-y-2">
           <ScoreBadge myRating={myRating} imdbRating={imdbRating} rtRating={rtRating} compact />
+          {footer && (
+            <div className="flex flex-wrap gap-1.5 text-xs text-muted">{footer}</div>
+          )}
+          {actions && <div className="flex flex-wrap gap-2 pt-1">{actions}</div>}
         </div>
-        {actions && <div className="mt-3 flex flex-wrap gap-2">{actions}</div>}
       </div>
     </article>
   );

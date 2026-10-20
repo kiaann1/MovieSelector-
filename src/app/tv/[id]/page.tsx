@@ -97,6 +97,19 @@ export default function TvDetailPage() {
 
   async function markAll(scope: "season" | "series") {
     setBulkBusy(true);
+    // Optimistic UI — mark aired episodes immediately
+    setSeasons((prev) =>
+      prev.map((s) => {
+        if (scope === "season" && s.seasonNumber !== activeSeason) return s;
+        return {
+          ...s,
+          episodes: s.episodes.map((ep) =>
+            ep.aired ? { ...ep, watched: true } : ep,
+          ),
+        };
+      }),
+    );
+
     try {
       const res = await fetch(`/api/tv/${params.id}/episodes`, {
         method: "PATCH",
@@ -109,11 +122,14 @@ export default function TvDetailPage() {
       });
       const data = await res.json();
       if (!res.ok) {
+        await load();
         alert(data.error || "Failed");
         return;
       }
-      await load();
       if (data.seriesComplete) setWizardOpen(true);
+    } catch {
+      await load();
+      alert("Failed to mark episodes");
     } finally {
       setBulkBusy(false);
     }

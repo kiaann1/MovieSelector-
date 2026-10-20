@@ -148,36 +148,37 @@ export default function WatchedPage() {
 
       <div className="media-grid">
         {items.map((item) => (
-          <div key={item.entryId} className="space-y-1">
-            <MediaCard
-              tmdbId={item.tmdbId}
-              mediaType={item.mediaType}
-              title={item.title}
-              year={item.year}
-              overview={item.comments || item.overview}
-              posterUrl={item.posterUrl}
-              myRating={item.myRating}
-              imdbRating={item.imdbRating}
-              rtRating={item.rtRating}
-              actions={
-                <button
-                  type="button"
-                  className="btn-secondary text-sm px-3"
-                  onClick={() => setEditing(item)}
-                >
-                  Edit
-                </button>
-              }
-            />
-            <div className="px-3 flex flex-wrap gap-2 text-xs text-muted">
-              <span>Watched {item.watchedOn}</span>
-              {(item.feelings ?? []).map((f) => (
-                <span key={f} className="rounded-md bg-cream/5 px-2 py-0.5 text-cream/70">
-                  {f}
-                </span>
-              ))}
-            </div>
-          </div>
+          <MediaCard
+            key={item.entryId}
+            tmdbId={item.tmdbId}
+            mediaType={item.mediaType}
+            title={item.title}
+            year={item.year}
+            overview={item.comments || item.overview}
+            posterUrl={item.posterUrl}
+            myRating={item.myRating}
+            imdbRating={item.imdbRating}
+            rtRating={item.rtRating}
+            footer={
+              <>
+                <span>Watched {item.watchedOn}</span>
+                {(item.feelings ?? []).map((f) => (
+                  <span key={f} className="rounded-md bg-cream/5 px-2 py-0.5 text-cream/70">
+                    {f}
+                  </span>
+                ))}
+              </>
+            }
+            actions={
+              <button
+                type="button"
+                className="btn-secondary text-sm px-3"
+                onClick={() => setEditing(item)}
+              >
+                Edit
+              </button>
+            }
+          />
         ))}
       </div>
 

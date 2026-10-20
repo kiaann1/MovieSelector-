@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 import { FavoriteMovie, users } from "@/lib/db/schema";
+import { DEFAULT_THEME, isThemeId } from "@/lib/themes";
 
 export async function POST(request: Request) {
   try {
@@ -76,6 +77,7 @@ export async function POST(request: Request) {
         avatarDataUrl: user.avatarDataUrl,
         favoriteGenres: user.favoriteGenres,
         favoriteMovies: user.favoriteMovies,
+        theme: isThemeId(user.theme) ? user.theme : DEFAULT_THEME,
       },
     });
     res.cookies.set(AUTH_COOKIE, token, SESSION_COOKIE_OPTIONS);

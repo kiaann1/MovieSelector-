@@ -2,10 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Poster } from "@/components/Poster";
+import { useTheme } from "@/components/ThemeProvider";
 import { MOVIE_GENRES } from "@/lib/genres";
 import { fileToAvatarDataUrl } from "@/lib/image";
+import { isThemeId, THEMES, ThemeId } from "@/lib/themes";
 import { posterUrl } from "@/lib/tmdb-client";
-import { Poster } from "@/components/Poster";
 
 type FavoriteMovie = {
   tmdbId: number;
@@ -20,11 +22,13 @@ type User = {
   avatarDataUrl: string | null;
   favoriteGenres: string[];
   favoriteMovies: FavoriteMovie[];
+  theme?: ThemeId;
   createdAt?: string;
 };
 
 export default function AccountPage() {
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
   const [user, setUser] = useState<User | null>(null);
   const [name, setName] = useState("");
   const [genres, setGenres] = useState<string[]>([]);
@@ -42,13 +46,16 @@ export default function AccountPage() {
       setUser(data.user);
       setName(data.user.name);
       setGenres(data.user.favoriteGenres ?? []);
+      if (isThemeId(data.user.theme)) {
+        await setTheme(data.user.theme, { persist: false });
+      }
       setError("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [setTheme]);
 
   useEffect(() => {
     load();
@@ -172,6 +179,45 @@ export default function AccountPage() {
         />
       </section>
 
+      <section className="mb-8 max-w-4xl">
+        <h2 className="font-display text-2xl text-cream mb-1">Theme</h2>
+        <p className="text-muted text-sm mb-4">
+          Colours, fonts, and vibe — synced to your account.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {THEMES.map((t) => {
+            const active = theme === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTheme(t.id)}
+                className={`text-left rounded-2xl border p-4 transition ${
+                  active
+                    ? "border-gold bg-gold/15 ring-1 ring-gold/40"
+                    : "border-cream/10 bg-surface/40 hover:border-gold/35"
+                }`}
+              >
+                <div className="flex gap-1.5 mb-3">
+                  {t.swatches.map((c) => (
+                    <span
+                      key={c}
+                      className="h-7 w-7 rounded-full border border-cream/10"
+                      style={{ background: c }}
+                    />
+                  ))}
+                </div>
+                <p className="font-display text-lg text-cream leading-tight">{t.name}</p>
+                <p className="text-xs text-muted mt-1">{t.blurb}</p>
+                {active && (
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-gold mt-3">Active</p>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
       <section className="mb-6 max-w-3xl">
         <h2 className="font-display text-2xl text-cream mb-3">Favourite genres</h2>
         <div className="flex flex-wrap gap-2">
@@ -196,17 +242,23 @@ export default function AccountPage() {
       </section>
 
       {(user.favoriteMovies?.length ?? 0) > 0 && (
-        <section className="mb-6 max-w-3xl">
+        <section className="mb-6 max-w-4xl">
           <h2 className="font-display text-2xl text-cream mb-3">Favourite movies</h2>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {user.favoriteMovies.map((m) => (
-              <div key={m.tmdbId} className="rounded-xl overflow-hidden border border-cream/10">
+              <div
+                key={m.tmdbId}
+                className="flex flex-col rounded-xl overflow-hidden border border-cream/10 bg-surface/40"
+                title={m.title}
+              >
                 <Poster
                   src={posterUrl(m.posterPath, "w185")}
                   alt={m.title}
-                  className="aspect-[2/3] w-full"
+                  className="aspect-[2/3] w-full shrink-0"
                 />
-                <p className="p-1.5 text-[11px] text-cream/75 line-clamp-2">{m.title}</p>
+                <p className="p-2 text-xs leading-snug text-cream/80 min-h-[3.25rem]">
+                  {m.title}
+                </p>
               </div>
             ))}
           </div>
