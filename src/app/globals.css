@@ -1,0 +1,188 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0c0b09;
+  --ink-elevated: #141210;
+  --surface: #1c1915;
+  --cream: #f2ebe3;
+  --muted: #9a9085;
+  --gold: #d4a373;
+  --gold-bright: #e8c49a;
+  --danger: #c45c4a;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-ink-elevated: var(--ink-elevated);
+  --color-surface: var(--surface);
+  --color-cream: var(--cream);
+  --color-muted: var(--muted);
+  --color-gold: var(--gold);
+  --color-gold-bright: var(--gold-bright);
+  --color-danger: var(--danger);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(212, 163, 115, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(196, 92, 74, 0.06), transparent 50%),
+    var(--ink);
+  color: var(--cream);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100dvh;
+}
+
+.font-display {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border-radius: 0.9rem;
+  background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+  color: #1a120a;
+  font-weight: 600;
+  padding: 0.65rem 1.1rem;
+  transition: transform 0.15s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(242, 235, 227, 0.14);
+  background: rgba(242, 235, 227, 0.04);
+  color: var(--cream);
+  font-weight: 500;
+  padding: 0.65rem 1.1rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(212, 163, 115, 0.45);
+  background: rgba(212, 163, 115, 0.08);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.5rem;
+  border-radius: 0.75rem;
+  color: var(--muted);
+  padding: 0.5rem 0.85rem;
+  font-size: 0.875rem;
+}
+
+.btn-ghost:hover {
+  color: var(--cream);
+  background: rgba(242, 235, 227, 0.05);
+}
+
+.input-field {
+  min-height: 2.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(242, 235, 227, 0.12);
+  background: rgba(12, 11, 9, 0.65);
+  color: var(--cream);
+  padding: 0.65rem 0.95rem;
+  outline: none;
+}
+
+.input-field:focus {
+  border-color: rgba(212, 163, 115, 0.55);
+  box-shadow: 0 0 0 3px rgba(212, 163, 115, 0.12);
+}
+
+.input-field::placeholder {
+  color: rgba(154, 144, 133, 0.8);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease both;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.animate-pop {
+  animation: pop 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 0.9s linear infinite;
+}
+
+.page-shell {
+  width: 100%;
+  max-width: 42rem;
+  margin-inline: auto;
+  padding: 1.25rem 1rem 6.5rem;
+}
+
+.brand-mark {
+  font-family: var(--font-display), Georgia, serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
