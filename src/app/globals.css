@@ -14,8 +14,8 @@
   --btn-text: #12081f;
   --glow-1: rgba(167, 139, 250, 0.18);
   --glow-2: rgba(124, 58, 237, 0.1);
-  --font-display: var(--font-violet-display);
-  --font-body: var(--font-violet-body);
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "Manrope", system-ui, sans-serif;
   --radius-btn: 0.9rem;
 }
 
@@ -31,8 +31,8 @@
   --btn-text: #1a120a;
   --glow-1: rgba(212, 163, 115, 0.12);
   --glow-2: rgba(196, 92, 74, 0.06);
-  --font-display: var(--font-cinema-display);
-  --font-body: var(--font-cinema-body);
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Figtree", system-ui, sans-serif;
   --radius-btn: 0.9rem;
 }
 
@@ -48,8 +48,8 @@
   --btn-text: #041016;
   --glow-1: rgba(34, 211, 238, 0.16);
   --glow-2: rgba(244, 114, 182, 0.12);
-  --font-display: var(--font-cyber-display);
-  --font-body: var(--font-cyber-body);
+  --font-display: "Orbitron", system-ui, sans-serif;
+  --font-body: "Rajdhani", system-ui, sans-serif;
   --radius-btn: 0.35rem;
 }
 
@@ -65,8 +65,8 @@
   --btn-text: #2a1020;
   --glow-1: rgba(249, 168, 212, 0.16);
   --glow-2: rgba(125, 211, 252, 0.1);
-  --font-display: var(--font-anime-display);
-  --font-body: var(--font-anime-body);
+  --font-display: "Zen Maru Gothic", system-ui, sans-serif;
+  --font-body: "Nunito", system-ui, sans-serif;
   --radius-btn: 1.25rem;
 }
 
@@ -82,8 +82,8 @@
   --btn-text: #140404;
   --glow-1: rgba(239, 68, 68, 0.16);
   --glow-2: rgba(59, 130, 246, 0.12);
-  --font-display: var(--font-hero-display);
-  --font-body: var(--font-hero-body);
+  --font-display: "Russo One", system-ui, sans-serif;
+  --font-body: "Oswald", system-ui, sans-serif;
   --radius-btn: 0.5rem;
 }
 
@@ -99,8 +99,8 @@
   --btn-text: #0a0a0a;
   --glow-1: rgba(255, 255, 255, 0.06);
   --glow-2: rgba(163, 163, 163, 0.05);
-  --font-display: var(--font-noir-display);
-  --font-body: var(--font-noir-body);
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Source Sans 3", system-ui, sans-serif;
   --radius-btn: 0.25rem;
 }
 
@@ -131,7 +131,7 @@ body {
   background-attachment: fixed;
   background-repeat: no-repeat;
   color: var(--cream);
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body);
   min-height: 100dvh;
   transition:
     background-color 0.25s ease,
@@ -145,7 +145,7 @@ body {
 }
 
 .font-display {
-  font-family: var(--font-display), Georgia, serif;
+  font-family: var(--font-display);
 }
 
 .btn-primary {
