@@ -14,6 +14,7 @@ type Props = {
   myRating?: number | null;
   imdbRating?: string | null;
   rtRating?: string | null;
+  reason?: string | null;
   actions?: React.ReactNode;
 };
 
@@ -27,6 +28,7 @@ export function MediaCard({
   myRating,
   imdbRating,
   rtRating,
+  reason,
   actions,
 }: Props) {
   const href = mediaType === "tv" ? `/tv/${tmdbId}` : `/movie/${tmdbId}`;
@@ -37,6 +39,9 @@ export function MediaCard({
         <Poster src={posterUrl} alt={title} className="h-[132px] w-[88px] md:h-[148px] md:w-[98px] rounded-lg" />
       </Link>
       <div className="min-w-0 flex-1 flex flex-col">
+        {reason && (
+          <p className="mb-1 text-[10px] uppercase tracking-[0.14em] text-gold/75">{reason}</p>
+        )}
         <Link href={href} className="group">
           <h3 className="font-display text-lg leading-snug text-cream group-hover:text-gold transition-colors line-clamp-2">
             {title}

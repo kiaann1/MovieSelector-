@@ -22,10 +22,23 @@ type RecItem = {
   reason: string;
 };
 
-export async function GET() {
+function shuffle<T>(items: T[]): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+export async function GET(request: Request) {
   try {
     const userId = await getSessionUserId();
     if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { searchParams } = new URL(request.url);
+    const pageParam = Number(searchParams.get("page"));
+    const page = Number.isFinite(pageParam) && pageParam >= 1 ? Math.min(pageParam, 8) : 1 + Math.floor(Math.random() * 4);
 
     const db = getDb();
     const user = await db.query.users.findFirst({ where: eq(users.id, userId) });
@@ -57,11 +70,12 @@ export async function GET() {
     }
 
     const buckets: RecItem[] = [];
+    const shuffledGenres = shuffle(genreIds).slice(0, 3);
 
-    if (genreIds.length > 0) {
+    if (shuffledGenres.length > 0) {
       const [movies, shows] = await Promise.all([
-        discoverMoviesByGenres(genreIds.slice(0, 3), 1),
-        discoverTvByGenres(genreIds.slice(0, 3), 1),
+        discoverMoviesByGenres(shuffledGenres, page),
+        discoverTvByGenres(shuffledGenres, page),
       ]);
       for (const m of movies) {
         buckets.push({ ...m, reason: "Matches your genres" });
@@ -71,44 +85,51 @@ export async function GET() {
       }
     }
 
-    const seedIds = [
+    const seedIds = shuffle([
       ...(user.favoriteMovies ?? []).map((m) => m.tmdbId),
       ...watched
         .filter((w) => w.media.mediaType === "movie")
-        .slice(0, 5)
         .map((w) => w.media.tmdbId),
-    ].slice(0, 4);
+    ]).slice(0, 4);
 
     for (const id of seedIds) {
       const [similar, recommended] = await Promise.all([
         getSimilarMovies(id).catch(() => []),
         getMovieRecommendations(id).catch(() => []),
       ]);
-      for (const m of similar.slice(0, 6)) {
+      for (const m of shuffle(similar).slice(0, 8)) {
         buckets.push({ ...m, reason: "Similar to titles you like" });
       }
-      for (const m of recommended.slice(0, 6)) {
+      for (const m of shuffle(recommended).slice(0, 8)) {
         buckets.push({ ...m, reason: "Recommended for you" });
       }
     }
 
     const seen = new Set<string>();
-    const results: RecItem[] = [];
-    for (const item of buckets) {
+    const unique: RecItem[] = [];
+    for (const item of shuffle(buckets)) {
       const key = `${item.mediaType}:${item.tmdbId}`;
       if (exclude.has(key) || seen.has(key)) continue;
       seen.add(key);
-      results.push(item);
-      if (results.length >= 36) break;
+      unique.push(item);
+      if (unique.length >= 36) break;
     }
 
-    return NextResponse.json({
-      results,
-      basedOn: {
-        genres: user.favoriteGenres ?? [],
-        favoriteMovies: (user.favoriteMovies ?? []).map((m) => m.title),
+    return NextResponse.json(
+      {
+        results: unique,
+        page,
+        basedOn: {
+          genres: user.favoriteGenres ?? [],
+          favoriteMovies: (user.favoriteMovies ?? []).map((m) => m.title),
+        },
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
+        },
+      },
+    );
   } catch (e) {
     const message = e instanceof Error ? e.message : "Recommendations failed";
     return NextResponse.json({ error: message }, { status: 500 });

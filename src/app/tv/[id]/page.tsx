@@ -49,6 +49,7 @@ export default function TvDetailPage() {
   const [wizardOpen, setWizardOpen] = useState(false);
   const [ratingEpisode, setRatingEpisode] = useState<{ season: number; episode: number } | null>(null);
   const [epRating, setEpRating] = useState(7);
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -57,9 +58,11 @@ export default function TvDetailPage() {
       if (!res.ok) throw new Error(data.error || "Failed to load");
       setMedia(data.media);
       setSeasons(data.seasons ?? []);
-      if (data.seasons?.[0]?.seasonNumber) {
-        setActiveSeason(data.seasons[0].seasonNumber);
-      }
+      setActiveSeason((current) => {
+        const nums = (data.seasons ?? []).map((s: Season) => s.seasonNumber);
+        if (nums.includes(current)) return current;
+        return nums[0] ?? 1;
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to load");
     }
@@ -90,6 +93,30 @@ export default function TvDetailPage() {
     const data = await res.json();
     if (!res.ok) alert(data.error || "Failed");
     else await load();
+  }
+
+  async function markAll(scope: "season" | "series") {
+    setBulkBusy(true);
+    try {
+      const res = await fetch(`/api/tv/${params.id}/episodes`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          markAll: true,
+          scope,
+          season: activeSeason,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || "Failed");
+        return;
+      }
+      await load();
+      if (data.seriesComplete) setWizardOpen(true);
+    } finally {
+      setBulkBusy(false);
+    }
   }
 
   async function toggleEpisode(seasonNum: number, ep: Episode, watched: boolean) {
@@ -254,7 +281,27 @@ export default function TvDetailPage() {
         </div>
 
         <section className="mt-2">
-          <h2 className="font-display text-2xl text-cream mb-3">Episodes</h2>
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-3">
+            <h2 className="font-display text-2xl text-cream">Episodes</h2>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="btn-secondary text-sm px-3 min-h-10"
+                disabled={bulkBusy || !(season?.episodes.some((e) => e.aired && !e.watched))}
+                onClick={() => markAll("season")}
+              >
+                {bulkBusy ? "Marking…" : `Mark S${activeSeason} watched`}
+              </button>
+              <button
+                type="button"
+                className="btn-primary text-sm px-3 min-h-10"
+                disabled={bulkBusy || progress.aired === 0 || progress.watched >= progress.aired}
+                onClick={() => markAll("series")}
+              >
+                {bulkBusy ? "Marking…" : "Mark all watched"}
+              </button>
+            </div>
+          </div>
           <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
             {seasons.map((s) => (
               <button

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { MediaCard } from "@/components/MediaCard";
+import { RatingWizard, WizardPayload } from "@/components/RatingWizard";
 
 type Item = {
   id: number;
@@ -34,6 +35,7 @@ export default function WatchedPage() {
   const [type, setType] = useState<"all" | "movie" | "tv">("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [editing, setEditing] = useState<Item | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -54,6 +56,39 @@ export default function WatchedPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  async function submitEdit(payload: WizardPayload) {
+    if (!editing) return;
+    const res = await fetch("/api/watched", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        mediaId: editing.id,
+        tmdbId: editing.tmdbId,
+        mediaType: editing.mediaType,
+        ...payload,
+      }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Update failed");
+
+    setItems((prev) =>
+      prev.map((item) =>
+        item.entryId === editing.entryId
+          ? {
+              ...item,
+              myRating: payload.myRating,
+              feelings: payload.feelings,
+              comments: payload.comments,
+              watchedOn: payload.watchedOn,
+              overview: payload.comments || item.overview,
+            }
+          : item,
+      ),
+    );
+    setEditing(null);
+    await load();
+  }
 
   return (
     <main className="page-shell">
@@ -124,6 +159,15 @@ export default function WatchedPage() {
               myRating={item.myRating}
               imdbRating={item.imdbRating}
               rtRating={item.rtRating}
+              actions={
+                <button
+                  type="button"
+                  className="btn-secondary text-sm px-3"
+                  onClick={() => setEditing(item)}
+                >
+                  Edit
+                </button>
+              }
             />
             <div className="px-3 flex flex-wrap gap-2 text-xs text-muted">
               <span>Watched {item.watchedOn}</span>
@@ -136,6 +180,26 @@ export default function WatchedPage() {
           </div>
         ))}
       </div>
+
+      <RatingWizard
+        open={Boolean(editing)}
+        mode="edit"
+        seedKey={editing?.entryId}
+        title={editing?.title ?? ""}
+        posterUrl={editing?.posterUrl}
+        initial={
+          editing
+            ? {
+                myRating: editing.myRating,
+                feelings: editing.feelings ?? [],
+                comments: editing.comments ?? "",
+                watchedOn: editing.watchedOn,
+              }
+            : null
+        }
+        onClose={() => setEditing(null)}
+        onSubmit={submitEdit}
+      />
     </main>
   );
 }

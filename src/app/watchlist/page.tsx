@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { MediaCard } from "@/components/MediaCard";
 import { RatingWizard, WizardPayload } from "@/components/RatingWizard";
@@ -18,13 +18,21 @@ type Item = {
   rtRating?: string | null;
 };
 
+type Filter = "all" | "movie" | "tv";
+
 export default function WatchlistPage() {
   const [items, setItems] = useState<Item[]>([]);
+  const [filter, setFilter] = useState<Filter>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [wizardItem, setWizardItem] = useState<Item | null>(null);
   const [randomItem, setRandomItem] = useState<Item | null>(null);
   const [randomOpen, setRandomOpen] = useState(false);
+
+  const filtered = useMemo(
+    () => (filter === "all" ? items : items.filter((i) => i.mediaType === filter)),
+    [items, filter],
+  );
 
   const load = useCallback(async () => {
     try {
@@ -78,7 +86,7 @@ export default function WatchlistPage() {
     const res = await fetch("/api/watchlist/random", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mediaType: "all" }),
+      body: JSON.stringify({ mediaType: filter }),
     });
     const data = await res.json();
     if (!res.ok) {
@@ -95,12 +103,41 @@ export default function WatchlistPage() {
         <div>
           <p className="brand-mark text-gold text-xs mb-2">Queue</p>
           <h1 className="font-display text-cream leading-none">Watchlist</h1>
-          <p className="mt-2 text-muted text-sm">{items.length} waiting</p>
+          <p className="mt-2 text-muted text-sm">
+            {filtered.length} waiting
+            {filter !== "all" ? ` · ${filter === "movie" ? "movies" : "TV"}` : ""}
+          </p>
         </div>
-        <button type="button" className="btn-primary shrink-0" onClick={pickRandom} disabled={!items.length}>
+        <button
+          type="button"
+          className="btn-primary shrink-0"
+          onClick={pickRandom}
+          disabled={!filtered.length}
+        >
           Random
         </button>
       </header>
+
+      <div className="mb-6 flex gap-2 rounded-2xl border border-cream/10 bg-surface/50 p-1 max-w-md">
+        {(
+          [
+            { id: "all", label: "All" },
+            { id: "movie", label: "Movies" },
+            { id: "tv", label: "TV Shows" },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setFilter(t.id)}
+            className={`flex-1 min-h-11 rounded-xl text-sm font-medium transition ${
+              filter === t.id ? "bg-gold text-ink" : "text-muted hover:text-cream"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
 
       {error && <p className="text-danger text-sm">{error}</p>}
 
@@ -117,8 +154,14 @@ export default function WatchlistPage() {
         </div>
       )}
 
+      {!loading && items.length > 0 && filtered.length === 0 && (
+        <p className="text-muted text-sm py-8 text-center">
+          No {filter === "movie" ? "movies" : "TV shows"} in your watchlist.
+        </p>
+      )}
+
       <div className="media-grid">
-        {items.map((item) => (
+        {filtered.map((item) => (
           <MediaCard
             key={item.id}
             tmdbId={item.tmdbId}

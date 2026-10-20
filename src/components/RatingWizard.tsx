@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FEELING_CHIPS } from "@/lib/feelings";
 import { Poster } from "./Poster";
 
@@ -15,13 +15,26 @@ type Props = {
   open: boolean;
   title: string;
   posterUrl?: string | null;
+  mode?: "create" | "edit";
+  /** Changes when a different item is opened so fields re-seed once. */
+  seedKey?: string | number | null;
+  initial?: Partial<WizardPayload> | null;
   onClose: () => void;
   onSubmit: (payload: WizardPayload) => Promise<void>;
 };
 
 const STEPS = ["Score", "Feelings", "Notes", "Date"] as const;
 
-export function RatingWizard({ open, title, posterUrl, onClose, onSubmit }: Props) {
+export function RatingWizard({
+  open,
+  title,
+  posterUrl,
+  mode = "create",
+  seedKey,
+  initial,
+  onClose,
+  onSubmit,
+}: Props) {
   const [step, setStep] = useState(0);
   const [rating, setRating] = useState(7);
   const [feelings, setFeelings] = useState<string[]>([]);
@@ -30,6 +43,19 @@ export function RatingWizard({ open, title, posterUrl, onClose, onSubmit }: Prop
   const [watchedOn, setWatchedOn] = useState(() => new Date().toISOString().slice(0, 10));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!open) return;
+    setStep(0);
+    setError("");
+    setCustomFeeling("");
+    setRating(initial?.myRating ?? 7);
+    setFeelings(initial?.feelings ?? []);
+    setComments(initial?.comments ?? "");
+    setWatchedOn(initial?.watchedOn ?? new Date().toISOString().slice(0, 10));
+    // seedKey intentionally gates re-init; initial is read only when opening
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, seedKey]);
 
   if (!open) return null;
 
@@ -49,11 +75,6 @@ export function RatingWizard({ open, title, posterUrl, onClose, onSubmit }: Prop
     setError("");
     try {
       await onSubmit({ myRating: rating, feelings, comments, watchedOn });
-      setStep(0);
-      setRating(7);
-      setFeelings([]);
-      setComments("");
-      setWatchedOn(new Date().toISOString().slice(0, 10));
       onClose();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Save failed");
@@ -74,7 +95,9 @@ export function RatingWizard({ open, title, posterUrl, onClose, onSubmit }: Prop
         <div className="flex items-center gap-4 border-b border-gold/10 p-5">
           <Poster src={posterUrl} alt={title} className="h-20 w-14 shrink-0 rounded-md" />
           <div className="min-w-0">
-            <p className="font-display text-xs uppercase tracking-[0.2em] text-gold/80">Rate</p>
+            <p className="font-display text-xs uppercase tracking-[0.2em] text-gold/80">
+              {mode === "edit" ? "Edit rating" : "Rate"}
+            </p>
             <h2 className="truncate font-display text-xl text-cream">{title}</h2>
             <div className="mt-2 flex gap-1.5">
               {STEPS.map((label, i) => (
@@ -205,7 +228,7 @@ export function RatingWizard({ open, title, posterUrl, onClose, onSubmit }: Prop
               </button>
             ) : (
               <button type="button" className="btn-primary flex-1" disabled={saving} onClick={finish}>
-                {saving ? "Saving…" : "Save"}
+                {saving ? "Saving…" : mode === "edit" ? "Update" : "Save"}
               </button>
             )}
           </div>

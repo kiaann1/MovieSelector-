@@ -21,13 +21,19 @@ export default function ForYouPage() {
     favoriteMovies: [],
   });
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [adding, setAdding] = useState<number | null>(null);
 
-  const load = useCallback(async (opts?: { silent?: boolean }) => {
-    if (!opts?.silent) setLoading(true);
+  const load = useCallback(async (mode: "initial" | "refresh" = "initial") => {
+    if (mode === "refresh") setRefreshing(true);
+    else setLoading(true);
+
     try {
-      const res = await fetch("/api/recommendations");
+      const page = 1 + Math.floor(Math.random() * 5);
+      const res = await fetch(`/api/recommendations?page=${page}&_=${Date.now()}`, {
+        cache: "no-store",
+      });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load");
       setResults(data.results ?? []);
@@ -37,11 +43,12 @@ export default function ForYouPage() {
       setError(e instanceof Error ? e.message : "Failed to load");
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    load();
+    load("initial");
   }, [load]);
 
   async function addToWatchlist(item: Rec) {
@@ -54,7 +61,9 @@ export default function ForYouPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Could not add");
-      setResults((prev) => prev.filter((r) => !(r.tmdbId === item.tmdbId && r.mediaType === item.mediaType)));
+      setResults((prev) =>
+        prev.filter((r) => !(r.tmdbId === item.tmdbId && r.mediaType === item.mediaType)),
+      );
     } catch (e) {
       alert(e instanceof Error ? e.message : "Could not add");
     } finally {
@@ -80,10 +89,10 @@ export default function ForYouPage() {
         <button
           type="button"
           className="btn-secondary shrink-0"
-          onClick={() => load({ silent: results.length > 0 })}
-          disabled={loading && results.length === 0}
+          onClick={() => load("refresh")}
+          disabled={loading || refreshing}
         >
-          Refresh
+          {refreshing ? "Refreshing…" : "Refresh"}
         </button>
       </header>
 
@@ -102,29 +111,28 @@ export default function ForYouPage() {
         </div>
       )}
 
-      <div className="media-grid">
+      <div className={`media-grid ${refreshing ? "opacity-60 transition-opacity" : ""}`}>
         {results.map((item) => (
-          <div key={`${item.mediaType}-${item.tmdbId}`} className="space-y-1">
-            <MediaCard
-              tmdbId={item.tmdbId}
-              mediaType={item.mediaType}
-              title={item.title}
-              year={item.year}
-              overview={item.overview}
-              posterUrl={posterUrl(item.posterPath)}
-              actions={
-                <button
-                  type="button"
-                  className="btn-primary text-sm px-3"
-                  disabled={adding === item.tmdbId}
-                  onClick={() => addToWatchlist(item)}
-                >
-                  {adding === item.tmdbId ? "Adding…" : "Add to watchlist"}
-                </button>
-              }
-            />
-            <p className="px-3 text-xs text-gold/80">{item.reason}</p>
-          </div>
+          <MediaCard
+            key={`${item.mediaType}-${item.tmdbId}`}
+            tmdbId={item.tmdbId}
+            mediaType={item.mediaType}
+            title={item.title}
+            year={item.year}
+            overview={item.overview}
+            posterUrl={posterUrl(item.posterPath)}
+            reason={item.reason}
+            actions={
+              <button
+                type="button"
+                className="btn-primary text-sm px-3"
+                disabled={adding === item.tmdbId}
+                onClick={() => addToWatchlist(item)}
+              >
+                {adding === item.tmdbId ? "Adding…" : "Add to watchlist"}
+              </button>
+            }
+          />
         ))}
       </div>
     </main>
