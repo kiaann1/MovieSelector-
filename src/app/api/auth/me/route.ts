@@ -1,5 +1,8 @@
+import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import { getSessionUser } from "@/lib/session";
+import { getDb } from "@/lib/db";
+import { FavoriteMovie, users } from "@/lib/db/schema";
+import { getSessionUser, getSessionUserId } from "@/lib/session";
 
 export async function GET() {
   try {
@@ -14,10 +17,66 @@ export async function GET() {
         avatarDataUrl: user.avatarDataUrl,
         favoriteGenres: user.favoriteGenres,
         favoriteMovies: user.favoriteMovies,
+        createdAt: user.createdAt,
       },
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Failed";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const userId = await getSessionUserId();
+    if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const body = (await request.json()) as {
+      name?: string;
+      avatarDataUrl?: string | null;
+      favoriteGenres?: string[];
+      favoriteMovies?: FavoriteMovie[];
+    };
+
+    const updates: Partial<typeof users.$inferInsert> = {};
+    if (typeof body.name === "string" && body.name.trim()) {
+      updates.name = body.name.trim();
+    }
+    if (body.avatarDataUrl !== undefined) {
+      updates.avatarDataUrl =
+        body.avatarDataUrl && body.avatarDataUrl.length < 600_000
+          ? body.avatarDataUrl
+          : null;
+    }
+    if (body.favoriteGenres) {
+      updates.favoriteGenres = body.favoriteGenres;
+    }
+    if (body.favoriteMovies) {
+      updates.favoriteMovies = body.favoriteMovies;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+    }
+
+    const db = getDb();
+    const [user] = await db
+      .update(users)
+      .set(updates)
+      .where(eq(users.id, userId))
+      .returning();
+
+    return NextResponse.json({
+      user: {
+        id: user.id,
+        name: user.name,
+        avatarDataUrl: user.avatarDataUrl,
+        favoriteGenres: user.favoriteGenres,
+        favoriteMovies: user.favoriteMovies,
+      },
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Update failed";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

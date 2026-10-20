@@ -36,7 +36,6 @@ export default function WatchedPage() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const params = new URLSearchParams({ sort });
       if (type !== "all") params.set("type", type);
@@ -58,10 +57,14 @@ export default function WatchedPage() {
 
   return (
     <main className="page-shell">
-      <header className="mb-6 animate-fade-in">
-        <p className="brand-mark text-gold text-xs mb-2">Archive</p>
-        <h1 className="font-display text-4xl text-cream leading-none">Watched</h1>
-        <p className="mt-2 text-muted text-sm">Sorted by your rating first — IMDb & RT are secondary.</p>
+      <header className="page-header animate-fade-in">
+        <div>
+          <p className="brand-mark text-gold text-xs mb-2">Archive</p>
+          <h1 className="font-display text-cream leading-none">Watched</h1>
+          <p className="mt-2 text-muted text-sm max-w-xl">
+            Sorted by your rating first — IMDb & RT are secondary.
+          </p>
+        </div>
       </header>
 
       <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
@@ -98,14 +101,17 @@ export default function WatchedPage() {
         ))}
       </div>
 
-      {loading && <p className="text-muted text-sm">Loading…</p>}
       {error && <p className="text-danger text-sm">{error}</p>}
 
-      {!loading && items.length === 0 && (
+      {loading && items.length === 0 && (
+        <p className="text-muted text-sm">Loading…</p>
+      )}
+
+      {!loading && items.length === 0 && !error && (
         <p className="text-muted text-center py-12">Nothing watched yet.</p>
       )}
 
-      <div className="space-y-3">
+      <div className="media-grid">
         {items.map((item) => (
           <div key={item.entryId} className="space-y-1">
             <MediaCard

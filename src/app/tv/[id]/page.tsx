@@ -172,64 +172,88 @@ export default function TvDetailPage() {
   return (
     <main className="page-shell">
       <div className="animate-fade-in">
-        <div className="flex gap-4">
-          <Poster src={media.posterUrl} alt={media.title} className="h-48 w-32 rounded-xl shrink-0" />
-          <div className="min-w-0">
-            <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Series</p>
-            <h1 className="font-display text-3xl text-cream leading-tight">{media.title}</h1>
-            {media.year && <p className="text-muted mt-1">{media.year}</p>}
-            <p className="text-sm text-cream/60 mt-2">
-              {progress.watched}/{progress.aired} aired episodes
-            </p>
-            <div className="mt-3">
-              <ScoreBadge
-                myRating={media.myRating}
-                imdbRating={media.imdbRating}
-                rtRating={media.rtRating}
-              />
+        <div className="detail-layout mb-8">
+          <div className="detail-hero">
+            <Poster
+              src={media.posterUrl}
+              alt={media.title}
+              className="poster-lg h-48 w-32 rounded-xl shrink-0 md:h-auto md:w-full"
+            />
+            <div className="min-w-0 md:hidden">
+              <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Series</p>
+              <h1 className="font-display text-3xl text-cream leading-tight">{media.title}</h1>
+              {media.year && <p className="text-muted mt-1">{media.year}</p>}
+              <p className="text-sm text-cream/60 mt-2">
+                {progress.watched}/{progress.aired} aired episodes
+              </p>
+              <div className="mt-3">
+                <ScoreBadge
+                  myRating={media.myRating}
+                  imdbRating={media.imdbRating}
+                  rtRating={media.rtRating}
+                />
+              </div>
             </div>
+          </div>
+
+          <div>
+            <div className="hidden md:block mb-4">
+              <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Series</p>
+              <h1 className="font-display text-4xl text-cream leading-tight">{media.title}</h1>
+              {media.year && <p className="text-muted mt-2 text-lg">{media.year}</p>}
+              <p className="text-sm text-cream/60 mt-2">
+                {progress.watched}/{progress.aired} aired episodes
+              </p>
+              <div className="mt-4">
+                <ScoreBadge
+                  myRating={media.myRating}
+                  imdbRating={media.imdbRating}
+                  rtRating={media.rtRating}
+                />
+              </div>
+            </div>
+
+            {media.overview && (
+              <p className="mt-2 md:mt-0 text-cream/70 leading-relaxed max-w-3xl">{media.overview}</p>
+            )}
+
+            <div className="mt-4 flex flex-wrap gap-2">
+              {!media.onWatchlist && !media.isWatched && (
+                <button type="button" className="btn-primary" onClick={addWatchlist}>
+                  Add to watchlist
+                </button>
+              )}
+              {!media.isWatched &&
+                progress.aired > 0 &&
+                progress.watched >= progress.aired && (
+                  <button type="button" className="btn-primary" onClick={() => setWizardOpen(true)}>
+                    Rate series
+                  </button>
+                )}
+              {media.isWatched && (
+                <button type="button" className="btn-secondary" onClick={() => setWizardOpen(true)}>
+                  Edit series rating
+                </button>
+              )}
+            </div>
+
+            {(media.castJson?.length ?? 0) > 0 && (
+              <section className="mt-6">
+                <h2 className="font-display text-xl text-cream mb-2">Cast</h2>
+                <ul className="space-y-1 text-sm text-muted columns-1 md:columns-2 gap-8">
+                  {media.castJson!.slice(0, 6).map((c) => (
+                    <li key={c.name} className="break-inside-avoid mb-1">
+                      <span className="text-cream/85">{c.name}</span>
+                      {c.character ? ` — ${c.character}` : ""}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
           </div>
         </div>
 
-        {media.overview && (
-          <p className="mt-6 text-cream/70 leading-relaxed">{media.overview}</p>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {!media.onWatchlist && !media.isWatched && (
-            <button type="button" className="btn-primary" onClick={addWatchlist}>
-              Add to watchlist
-            </button>
-          )}
-          {!media.isWatched &&
-            progress.aired > 0 &&
-            progress.watched >= progress.aired && (
-              <button type="button" className="btn-primary" onClick={() => setWizardOpen(true)}>
-                Rate series
-              </button>
-            )}
-          {media.isWatched && (
-            <button type="button" className="btn-secondary" onClick={() => setWizardOpen(true)}>
-              Edit series rating
-            </button>
-          )}
-        </div>
-
-        {(media.castJson?.length ?? 0) > 0 && (
-          <section className="mt-6">
-            <h2 className="font-display text-xl text-cream mb-2">Cast</h2>
-            <ul className="space-y-1 text-sm text-muted">
-              {media.castJson!.slice(0, 6).map((c) => (
-                <li key={c.name}>
-                  <span className="text-cream/85">{c.name}</span>
-                  {c.character ? ` — ${c.character}` : ""}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        <section className="mt-8">
+        <section className="mt-2">
           <h2 className="font-display text-2xl text-cream mb-3">Episodes</h2>
           <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
             {seasons.map((s) => (
@@ -248,7 +272,7 @@ export default function TvDetailPage() {
             ))}
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 md:grid md:grid-cols-2 md:gap-3 md:space-y-0">
             {season?.episodes.map((ep) => (
               <div
                 key={ep.episodeNumber}

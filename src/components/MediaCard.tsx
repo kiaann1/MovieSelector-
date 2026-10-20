@@ -32,9 +32,9 @@ export function MediaCard({
   const href = mediaType === "tv" ? `/tv/${tmdbId}` : `/movie/${tmdbId}`;
 
   return (
-    <article className="flex gap-3 rounded-2xl border border-cream/8 bg-surface/60 p-3 transition hover:border-gold/25">
+    <article className="flex gap-3 rounded-2xl border border-cream/8 bg-surface/60 p-3 transition hover:border-gold/25 h-full">
       <Link href={href} className="shrink-0">
-        <Poster src={posterUrl} alt={title} className="h-[132px] w-[88px] rounded-lg" />
+        <Poster src={posterUrl} alt={title} className="h-[132px] w-[88px] md:h-[148px] md:w-[98px] rounded-lg" />
       </Link>
       <div className="min-w-0 flex-1 flex flex-col">
         <Link href={href} className="group">
@@ -46,7 +46,7 @@ export function MediaCard({
             {year ? ` · ${year}` : ""}
           </p>
         </Link>
-        {overview && <p className="mt-2 text-sm text-cream/55 line-clamp-2">{overview}</p>}
+        {overview && <p className="mt-2 text-sm text-cream/55 line-clamp-2 md:line-clamp-3">{overview}</p>}
         <div className="mt-auto pt-2">
           <ScoreBadge myRating={myRating} imdbRating={imdbRating} rtRating={rtRating} compact />
         </div>

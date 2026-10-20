@@ -102,10 +102,14 @@ export default function MovieDetailPage() {
 
   return (
     <main className="page-shell">
-      <div className="animate-fade-in">
-        <div className="flex gap-4">
-          <Poster src={media.posterUrl} alt={media.title} className="h-48 w-32 rounded-xl shrink-0" />
-          <div className="min-w-0">
+      <div className="animate-fade-in detail-layout">
+        <div className="detail-hero">
+          <Poster
+            src={media.posterUrl}
+            alt={media.title}
+            className="poster-lg h-48 w-32 rounded-xl shrink-0 md:h-auto md:w-full"
+          />
+          <div className="min-w-0 md:hidden">
             <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Film</p>
             <h1 className="font-display text-3xl text-cream leading-tight">{media.title}</h1>
             {media.year && <p className="text-muted mt-1">{media.year}</p>}
@@ -119,40 +123,55 @@ export default function MovieDetailPage() {
           </div>
         </div>
 
-        {media.overview && (
-          <p className="mt-6 text-cream/70 leading-relaxed">{media.overview}</p>
-        )}
+        <div>
+          <div className="hidden md:block mb-4">
+            <p className="text-xs uppercase tracking-[0.2em] text-gold mb-1">Film</p>
+            <h1 className="font-display text-4xl text-cream leading-tight">{media.title}</h1>
+            {media.year && <p className="text-muted mt-2 text-lg">{media.year}</p>}
+            <div className="mt-4">
+              <ScoreBadge
+                myRating={media.myRating}
+                imdbRating={media.imdbRating}
+                rtRating={media.rtRating}
+              />
+            </div>
+          </div>
 
-        {(media.castJson?.length ?? 0) > 0 && (
-          <section className="mt-6">
-            <h2 className="font-display text-xl text-cream mb-2">Cast</h2>
-            <ul className="space-y-1 text-sm text-muted">
-              {media.castJson!.slice(0, 8).map((c) => (
-                <li key={c.name}>
-                  <span className="text-cream/85">{c.name}</span>
-                  {c.character ? ` — ${c.character}` : ""}
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+          {media.overview && (
+            <p className="mt-2 md:mt-0 text-cream/70 leading-relaxed max-w-3xl">{media.overview}</p>
+          )}
 
-        <div className="mt-8 flex flex-wrap gap-2">
-          {!media.isWatched && !media.onWatchlist && (
-            <button type="button" className="btn-primary" disabled={busy} onClick={addWatchlist}>
-              Add to watchlist
-            </button>
+          {(media.castJson?.length ?? 0) > 0 && (
+            <section className="mt-6">
+              <h2 className="font-display text-xl text-cream mb-2">Cast</h2>
+              <ul className="space-y-1 text-sm text-muted columns-1 md:columns-2 gap-8">
+                {media.castJson!.slice(0, 8).map((c) => (
+                  <li key={c.name} className="break-inside-avoid mb-1">
+                    <span className="text-cream/85">{c.name}</span>
+                    {c.character ? ` — ${c.character}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
-          {!media.isWatched && (
-            <button type="button" className="btn-primary" onClick={() => setWizardOpen(true)}>
-              Mark watched
-            </button>
-          )}
-          {media.isWatched && (
-            <button type="button" className="btn-secondary" onClick={() => setWizardOpen(true)}>
-              Edit rating
-            </button>
-          )}
+
+          <div className="mt-8 flex flex-wrap gap-2">
+            {!media.isWatched && !media.onWatchlist && (
+              <button type="button" className="btn-primary" disabled={busy} onClick={addWatchlist}>
+                Add to watchlist
+              </button>
+            )}
+            {!media.isWatched && (
+              <button type="button" className="btn-primary" onClick={() => setWizardOpen(true)}>
+                Mark watched
+              </button>
+            )}
+            {media.isWatched && (
+              <button type="button" className="btn-secondary" onClick={() => setWizardOpen(true)}>
+                Edit rating
+              </button>
+            )}
+          </div>
         </div>
       </div>
 

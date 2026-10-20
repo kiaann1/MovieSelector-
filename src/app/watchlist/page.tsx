@@ -27,7 +27,6 @@ export default function WatchlistPage() {
   const [randomOpen, setRandomOpen] = useState(false);
 
   const load = useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch("/api/watchlist");
       const data = await res.json();
@@ -92,10 +91,10 @@ export default function WatchlistPage() {
 
   return (
     <main className="page-shell">
-      <header className="mb-6 flex items-end justify-between gap-3 animate-fade-in">
+      <header className="page-header animate-fade-in">
         <div>
           <p className="brand-mark text-gold text-xs mb-2">Queue</p>
-          <h1 className="font-display text-4xl text-cream leading-none">Watchlist</h1>
+          <h1 className="font-display text-cream leading-none">Watchlist</h1>
           <p className="mt-2 text-muted text-sm">{items.length} waiting</p>
         </div>
         <button type="button" className="btn-primary shrink-0" onClick={pickRandom} disabled={!items.length}>
@@ -103,11 +102,14 @@ export default function WatchlistPage() {
         </button>
       </header>
 
-      {loading && <p className="text-muted text-sm">Loading…</p>}
       {error && <p className="text-danger text-sm">{error}</p>}
 
-      {!loading && items.length === 0 && (
-        <div className="rounded-2xl border border-dashed border-cream/15 p-8 text-center">
+      {loading && items.length === 0 && (
+        <p className="text-muted text-sm">Loading…</p>
+      )}
+
+      {!loading && items.length === 0 && !error && (
+        <div className="rounded-2xl border border-dashed border-cream/15 p-8 text-center max-w-lg">
           <p className="text-cream/80 mb-3">Your queue is empty.</p>
           <Link href="/" className="btn-secondary inline-flex">
             Search titles
@@ -115,7 +117,7 @@ export default function WatchlistPage() {
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="media-grid">
         {items.map((item) => (
           <MediaCard
             key={item.id}

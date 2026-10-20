@@ -66,6 +66,18 @@ export async function searchMedia(query: string, type: "movie" | "tv") {
   }));
 }
 
+function mapMovieResults(results: TmdbSearchItem[]) {
+  return results.map((r) => ({
+    tmdbId: r.id,
+    mediaType: "movie" as const,
+    title: r.title ?? r.name ?? "Untitled",
+    overview: r.overview ?? "",
+    posterPath: r.poster_path ?? null,
+    year: (r.release_date ?? r.first_air_date)?.slice(0, 4) ?? "",
+    voteAverage: r.vote_average ?? null,
+  }));
+}
+
 export async function discoverMoviesByGenres(genreIds: number[], page = 1) {
   const data = await tmdbFetch<{ results: TmdbSearchItem[] }>("/discover/movie", {
     with_genres: genreIds.join(","),
@@ -73,13 +85,35 @@ export async function discoverMoviesByGenres(genreIds: number[], page = 1) {
     include_adult: "false",
     page: String(page),
   });
+  return mapMovieResults(data.results);
+}
+
+export async function getSimilarMovies(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbSearchItem[] }>(`/movie/${tmdbId}/similar`);
+  return mapMovieResults(data.results);
+}
+
+export async function getMovieRecommendations(tmdbId: number) {
+  const data = await tmdbFetch<{ results: TmdbSearchItem[] }>(
+    `/movie/${tmdbId}/recommendations`,
+  );
+  return mapMovieResults(data.results);
+}
+
+export async function discoverTvByGenres(genreIds: number[], page = 1) {
+  const data = await tmdbFetch<{ results: TmdbSearchItem[] }>("/discover/tv", {
+    with_genres: genreIds.join(","),
+    sort_by: "popularity.desc",
+    include_adult: "false",
+    page: String(page),
+  });
   return data.results.map((r) => ({
     tmdbId: r.id,
-    mediaType: "movie" as const,
-    title: r.title ?? "Untitled",
+    mediaType: "tv" as const,
+    title: r.name ?? "Untitled",
     overview: r.overview ?? "",
     posterPath: r.poster_path ?? null,
-    year: r.release_date?.slice(0, 4) ?? "",
+    year: r.first_air_date?.slice(0, 4) ?? "",
     voteAverage: r.vote_average ?? null,
   }));
 }

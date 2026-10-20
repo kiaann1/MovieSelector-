@@ -43,21 +43,21 @@ function UnlockFlow() {
   }
 
   return (
-    <main className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-10">
+    <main className="relative flex min-h-dvh flex-col items-center justify-center px-5 py-10 md:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22 opacity=%220.04%22/%3E%3C/svg%3E')] opacity-80" />
 
       {mode === "welcome" && (
-        <div className="relative w-full max-w-sm animate-fade-in text-center">
+        <div className="relative w-full max-w-sm md:max-w-xl animate-fade-in text-center md:rounded-3xl md:border md:border-gold/20 md:bg-ink-elevated/80 md:p-12 md:shadow-2xl md:backdrop-blur-sm">
           <p className="brand-mark text-gold text-sm mb-3">MovieSelector</p>
-          <h1 className="font-display text-5xl text-cream mb-3 leading-none">Your reel starts here</h1>
-          <p className="text-muted text-sm mb-10">
+          <h1 className="font-display text-5xl md:text-6xl text-cream mb-3 leading-none">Your reel starts here</h1>
+          <p className="text-muted text-sm md:text-base mb-10 max-w-md mx-auto">
             Track films & series, rate what you finish, sync across your devices.
           </p>
-          <div className="space-y-3">
-            <button type="button" className="btn-primary w-full" onClick={() => setMode("join")}>
+          <div className="space-y-3 md:flex md:gap-3 md:space-y-0 md:justify-center">
+            <button type="button" className="btn-primary w-full md:w-auto md:min-w-[10rem]" onClick={() => setMode("join")}>
               Already joined
             </button>
-            <button type="button" className="btn-secondary w-full" onClick={() => setMode("new")}>
+            <button type="button" className="btn-secondary w-full md:w-auto md:min-w-[10rem]" onClick={() => setMode("new")}>
               New here
             </button>
           </div>

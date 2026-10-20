@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Figtree } from "next/font/google";
-import { BottomNav } from "@/components/BottomNav";
+import { AppShell } from "@/components/AppShell";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 import "./globals.css";
 
@@ -44,8 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
       <body className="min-h-full antialiased">
-        {children}
-        <BottomNav />
+        <AppShell>{children}</AppShell>
         <ServiceWorkerRegister />
       </body>
     </html>
